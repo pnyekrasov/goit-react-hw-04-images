@@ -21,9 +21,19 @@ export class ImageGalleryItem extends Component {
           alt={tags}
           onClick={this.toggleModal}
         />
-        <ModalWindow isOpen={this.state.isModalOpen} isClose={this.toggleModal}>
+        <ModalWindow
+          isOpen={this.state.isModalOpen}
+          isClose={this.toggleModal}
+
+          // isOpen={isOpen}
+          // onRequestClose={isClose}
+          // style={customStyles}
+        >
           <img src={largeImageURL} alt={tags} />
         </ModalWindow>
+        {/* <ModalWindow isOpen={this.state.isModalOpen} isClose={this.toggleModal}>
+          <img src={largeImageURL} alt={tags} />
+        </ModalWindow> */}
       </>
     );
   }
