@@ -4,8 +4,8 @@ import { Button } from './Button/Button';
 import { fetchPhotos } from 'pixabay-api';
 import { Container } from './App.styled';
 import { Loader } from './Loader/Loader';
-import { Component } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
+import { useEffect, useState } from 'react';
 
 const PER_PAGE = 12;
 const notifySubmit = () =>
@@ -15,76 +15,68 @@ const notifySearch = () =>
     'Sorry, there are no images matching your search query. Please try again.'
   );
 
-export class App extends Component {
-  state = {
-    query: '',
-    images: [],
-    page: 1,
-    loading: false,
-    total: 1,
-  };
+export const App = () => {
+  const [query, setQuery] = useState('');
+  const [images, setImages] = useState([]);
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [total, setTotal] = useState(1);
 
-  async componentDidUpdate(_, prevState) {
-    if (
-      prevState.query !== this.state.query ||
-      prevState.page !== this.state.page
-    ) {
+  useEffect(() => {
+    if (query === '') return;
+    async function getPhotos() {
       try {
-        this.setState({ loading: true });
+        setLoading(true);
 
-        const index = this.state.query.indexOf('/') + 1;
-        const currentQuery = this.state.query.slice(index);
-        const currentpage = this.state.page;
+        const index = query.indexOf('/') + 1;
+        const currentQuery = query.slice(index);
+        const currentpage = page;
+
         const { totalHits, hits } = await fetchPhotos(
           currentQuery,
           currentpage
         );
+
         if (totalHits === 0) {
           return notifySearch();
         }
-        this.setState(prevState => ({
-          total: totalHits,
-          images: [...prevState.images, ...hits],
-        }));
+        setTotal(totalHits);
+        setImages(state => [...state, ...hits]);
       } catch (error) {
         console.log(error);
       } finally {
-        this.setState({ loading: false });
+        setLoading(false);
       }
     }
-  }
+    getPhotos();
+  }, [query, page]);
 
-  hendleSubmit = newQuery => {
+  const hendleSubmit = newQuery => {
     if (!newQuery.trim()) {
       return notifySubmit();
     }
-    this.setState({
-      query: `${Date.now()}/${newQuery}`,
-      images: [],
-      page: 1,
-      loading: false,
-      total: 1,
-    });
+    setQuery(`${Date.now()}/${newQuery}`);
+    setImages([]);
+    setPage(1);
+    setLoading(false);
+    setTotal(1);
   };
 
-  handleLoadMore = () => {
-    this.setState(prevState => ({ page: prevState.page + 1 }));
+  const handleLoadMore = () => {
+    setPage(state => state + 1);
   };
 
-  render() {
-    const { total, loading, images, page } = this.state;
-    const limit = Math.ceil(total / PER_PAGE);
+  const limit = Math.ceil(total / PER_PAGE);
 
-    return (
-      <Container>
-        <Searchbar onChange={this.hendleSubmit} />
-        {images.length > 0 && <ImageGallery items={images} />}
-        {loading && <Loader />}
-        {images.length > 0 && page !== limit && (
-          <Button onClick={this.handleLoadMore} />
-        )}
-        <Toaster position="top-center" reverseOrder={false} />
-      </Container>
-    );
-  }
-}
+  return (
+    <Container>
+      <Searchbar onChange={hendleSubmit} />
+      {images.length > 0 && <ImageGallery items={images} />}
+      {loading && <Loader />}
+      {images.length > 0 && page !== limit && (
+        <Button onClick={handleLoadMore} />
+      )}
+      <Toaster position="top-center" reverseOrder={false} />
+    </Container>
+  );
+};

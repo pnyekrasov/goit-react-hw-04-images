@@ -27,18 +27,8 @@ const customStyles = {
 
 export const ModalWindow = ({ isOpen, isClose, children }) => {
   return (
-    <Modal
-      isOpen={isOpen}
-      onRequestClose={isClose}
-      style={customStyles}
-      // isOpen={this.state.isModalOpen}
-      // isClose={this.toggleModal}
-    >
+    <Modal isOpen={isOpen} onRequestClose={isClose} style={customStyles}>
       {children}
-      {/* <img src={largeImageURL} alt={tags} /> */}
     </Modal>
-    // <Modal isOpen={isOpen} onRequestClose={isClose} style={customStyles}>
-    //   {children}
-    // </Modal>
   );
 };
