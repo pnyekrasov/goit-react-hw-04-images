@@ -8,12 +8,6 @@ import toast, { Toaster } from 'react-hot-toast';
 import { useEffect, useState } from 'react';
 
 const PER_PAGE = 12;
-const notifySubmit = () =>
-  toast.error('Enter the data in the field "Search images and photos", please');
-const notifySearch = () =>
-  toast.error(
-    'Sorry, there are no images matching your search query. Please try again.'
-  );
 
 export const App = () => {
   const [query, setQuery] = useState('');
@@ -38,7 +32,9 @@ export const App = () => {
         );
 
         if (totalHits === 0) {
-          return notifySearch();
+          return toast.error(
+            'Sorry, there are no images matching your search query. Please try again.'
+          );
         }
         setTotal(totalHits);
         setImages(state => [...state, ...hits]);
@@ -53,7 +49,9 @@ export const App = () => {
 
   const hendleSubmit = newQuery => {
     if (!newQuery.trim()) {
-      return notifySubmit();
+      return toast.error(
+        'Enter the data in the field "Search images and photos", please'
+      );
     }
     setQuery(`${Date.now()}/${newQuery}`);
     setImages([]);
